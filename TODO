@@ -1,0 +1,32 @@
+TODO
+
+==== Sort out the users table, one table of all users then differentiate by role[tutor,student,parent,public]
+
+
+1 create login token, and send it through cookie with the expiration time
+2 to view users or words you should depend on having a token,
+3 token is generated when logged in
+4 first step copy the token manually and place the headers to make request like (get all words/users)
+
+
+
+
+
+
+== add all current users table fields to the sanitization function
+
+
+
+
+
+
+
+xss
+sql-injection
+user-input
+sanitization
+
+
+
+https://expressjs.com/en/guide/using-middleware.html
+https://hackernoon.com/effective-use-of-middleware-in-expressjs-practical-approaches
