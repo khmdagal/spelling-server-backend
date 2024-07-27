@@ -162,7 +162,7 @@ exports.protect = async (req, res, next) => {
     next()
 }
 
-exports.protectSessionCreation = async (req, res, next) => {
+exports.adminOnly = async (req, res, next) => {
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1]
