@@ -19,5 +19,8 @@
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.5",
     "xss-clean": "^0.1.4"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
