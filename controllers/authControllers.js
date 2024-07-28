@@ -16,9 +16,6 @@ const sendToken = async () => {
 }
 
 exports.signUp = async (req, res, next) => {
-    const user_role = req.params.role;
-    const user_school = req.params.school;
-
     // first checking the body request and validate
     console.log("===Body data comes ===>>>", req.body)
     const result = validationResult(req)
@@ -78,7 +75,6 @@ exports.signUp = async (req, res, next) => {
         status: 'succuss',
         data: cleanNewUserData
     })
-
     next()
 }
 
