@@ -90,12 +90,7 @@ exports.signUp = async (req, res, next) => {
 exports.logIn = async (req, res, next) => {
     try {
         const { username, password } = req.body;
-        console.log(
-            `username ${username}
-         password ${password}
         
-        `)
-
         // 1) check if username and password are not empty
         if (!username || !password) {
             res.status(401).send('Please provide username and password')
@@ -104,12 +99,18 @@ exports.logIn = async (req, res, next) => {
         // 2) Check if the username exists
         const userNameExist = (await pool.query(`select user_id, username, password from users where username=$1`, [username]));
 
+        if (userNameExist.rowCount === 0) {
+            return res.status(401).json({
+                status: 'Unauthorized',
+                message: 'Incorrect username or password'
+            });
+        }
         // 2.1) if username exits then compare the coming password to the encrypted password stored in the DB 
         const encryptedPassword = userNameExist.rows[0].password
         const correct = await correctPassword(password, encryptedPassword)
 
 
-        if (userNameExist.rowCount === 0 || !correct) {
+        if (!correct) {
             return res.status(401).json({
                 status: 'Unauthorized',
                 message: 'Incorrect username or password'
