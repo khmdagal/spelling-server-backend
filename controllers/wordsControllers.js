@@ -4,11 +4,10 @@ exports.getWords = async (req, res, next) => {
 
     try {
         const selectedYears = req.params.yearsSelected;
-        const words = await pool.query(`select  word_id, ${selectedYears} from spelling_table`)
+        const words = await (await pool.query(`select  word_id, ${selectedYears} from spelling_table`)).rows
         res.status(200).json({
-            selectedYears,
             status: 'success',
-            data: words.rows
+            words
         })
     } catch (error) {
         console.log(error)
