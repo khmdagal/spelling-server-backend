@@ -19,7 +19,7 @@ exports.getWords = async (req, res, next) => {
 exports.getPracticeSessions = async (req, res, next) => {
 
     try {
-        const practiceSessions = await pool.query(`select *  from weeklyspellingpractice`)
+        const practiceSessions = await pool.query(`select *  from weeklypractice`)
         res.status(200).json({
             status: 'success',
             data: practiceSessions.rows
@@ -44,7 +44,7 @@ exports.createPracticeSession = async (req, res, next) => {
     console.log(session)
     try {
         const practiceSession = await pool.query(`
-            insert into weeklyspellingpractice(practice_id,words,created_at,expires_in)
+            insert into weeklypractice(practice_id,words,created_at,expires_in)
             values($1,$2,$3,$4)
             `, [session.practice_id, session.words, session.created_at, session.expires_in])
 
