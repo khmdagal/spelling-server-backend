@@ -97,7 +97,7 @@ exports.logIn = async (req, res, next) => {
         }
 
         // 2) Check if the username exists
-        const userNameExist = (await pool.query(`select user_id, username, password from users where username=$1`, [username]));
+        const userNameExist = (await pool.query(`select user_id, username, school_id, password, approved from users where username=$1`, [username]));
 
         if (userNameExist.rowCount === 0) {
             return res.status(401).json({
@@ -118,7 +118,12 @@ exports.logIn = async (req, res, next) => {
         }
 
         // 3 if request body not empty, and username exists and password is correct
-        const token = createJwtToken(userNameExist.rows[0].user_id)
+
+        const correctUserAccessed = {
+            token: createJwtToken(userNameExist.rows[0].user_id),
+            school_id: userNameExist.rows[0].school_id,
+            approved: userNameExist.rows[0].approved
+        }
         const cookiesOption = {
             expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
             secure: true,
@@ -129,11 +134,13 @@ exports.logIn = async (req, res, next) => {
             cookiesOption.secure = false
         }
 
-        res.cookie('jwt', token, cookiesOption)
+        res.cookie('jwt', correctUserAccessed.token, cookiesOption)
 
         res.status(200).json({
             status: 'success',
-            token
+            token: correctUserAccessed.token,
+            school_id: correctUserAccessed.school_id,
+            approved: correctUserAccessed.approved
         })
 
 
@@ -192,7 +199,13 @@ exports.adminOnly = async (req, res, next) => {
 
     const accessedTeacher = (await pool.query(`select user_id,name, approved from users where user_id=$1 and approved='true'`, [decoded.id])).rowCount
 
-    if (!accessedTeacher) next(new Error('Teacher\'s account not exist or not approved yet'))
+    if (!accessedTeacher) {
+        return res.status(401).json({
+            status: 'Not authorized',
+            message: 'Your are not authorized for this task, please contact your school admin'
+        })
+    }
+
     //===========
     // Here for future I want to check if the password was changed after the token was issued
     // and then reject the access request if the password was changed
