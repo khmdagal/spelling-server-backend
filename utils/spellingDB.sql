@@ -4,17 +4,9 @@ weeklypractice,
 schools,
 users,
 sessions,
-spelling_table
+spelling_table,
+classes,
 cascade;
-
--- Create the weeklyspellingpractice table
-CREATE TABLE weeklypractice (
-   id SERIAL PRIMARY KEY, 
-   practice_id VARCHAR (255) UNIQUE NOT NULL, 
-   words text[] NOT NULL, 
-   created_at TIMESTAMP NOT NULL, 
-   expires_in TIMESTAMP NOT NULL
-);
 
 -- Create the schools table
 CREATE TABLE schools (
@@ -22,8 +14,37 @@ CREATE TABLE schools (
     school_name VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255),
     phone_number VARCHAR(255) UNIQUE,
-	website varchar(150),
-    classes TEXT[] NOT NULL
+	website varchar(150)
+);
+
+--Create classes table
+CREATE TABLE classes (
+    class_id SERIAL PRIMARY KEY,
+    class_name VARCHAR(255) NOT NULL,
+    school_id INT NOT NULL,
+    CONSTRAINT fk_school
+        FOREIGN KEY(school_id)
+        REFERENCES schools(school_id)
+        ON DELETE SET NULL
+);
+
+-- Create the weeklyspellingpractice table
+CREATE TABLE weeklypractice (
+    id SERIAL PRIMARY KEY, 
+    practice_id VARCHAR (255) UNIQUE NOT NULL, 
+    words TEXT[] NOT NULL,
+    school_id INT NOT NULL,
+    class_id INT,
+    created_at TIMESTAMP NOT NULL, 
+    expires_in TIMESTAMP NOT NULL,
+    CONSTRAINT fk_school
+        FOREIGN KEY(school_id) 
+        REFERENCES schools(school_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_class
+        FOREIGN KEY(class_id)
+        REFERENCES classes(class_id)
+        ON DELETE SET NULL
 );
 
 -- Create users table
@@ -45,14 +66,18 @@ CREATE TABLE users (
 
 -- Create sessions table
 CREATE TABLE sessions (
-session_id serial PRIMARY KEY,
-user_id INT REFERENCES users (user_id),
-correctWordsList TEXT,
-wrongWordsList TEXT,
-number_of_correct_words INT,
-number_of_incorrect_words INT,
-session_accuracy_percentage NUMERIC(5,2),
-percentage_sign VARCHAR(1) DEFAULT '%'
+    session_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    correctWordsList TEXT[],   -- Array type for storing lists of words
+    wrongWordsList TEXT[],     -- Array type for storing lists of words
+    number_of_correct_words INT NOT NULL,
+    number_of_incorrect_words INT NOT NULL,
+    session_accuracy_percentage NUMERIC(5,2),
+    percentage_sign VARCHAR(1) DEFAULT '%',
+    CONSTRAINT fk_user
+        FOREIGN KEY (user_id)
+        REFERENCES users (user_id)
+        ON DELETE SET NULL
 );
 
 -- Create words table
