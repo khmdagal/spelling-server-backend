@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken')
 const pool = require('../utils/db/db');
 const { validationResult } = require('express-validator');
 const { correctPassword } = require('../middlewares/helper');
-const { error } = require('console');
 
 const createJwtToken = (id) => {
     const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
@@ -143,7 +142,6 @@ exports.logIn = async (req, res, next) => {
             approved: correctUserAccessed.approved
         })
 
-
     } catch (err) {
         console.error(err);
         res.status(500).send(err);
@@ -151,6 +149,47 @@ exports.logIn = async (req, res, next) => {
     }
 
 };
+
+exports.adminOnly = async (req, res, next) => {
+
+    try {
+        let token;
+        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+            token = req.headers["authorization"]?.split(' ')[1]
+        }
+        if (!token) next(new Error('Your not logged in'))
+
+        // 2) Now lets verify the token
+
+        const decoded = await jwt.verify(token, process.env.JWT_SECRET)
+        // promisify(jwt.verify)(token, process.env.JWT_SECRET)
+
+        const accessedTeacher = (await pool.query(`select user_id,name, approved from users where user_id=$1 and approved='true'`, [decoded.id])).rowCount
+
+        if (!accessedTeacher) {
+            return res.status(401).json({
+                status: 'Not authorized',
+                message: 'Your are not authorized for this task, please contact your school admin'
+            })
+        }
+
+        //===========
+        // Here for future I want to check if the password was changed after the token was issued
+        // and then reject the access request if the password was changed
+        //=========
+
+        //THEN NOW GRANT ACCESS TO PROJECTED ROUTE
+
+        req.user = accessedTeacher
+
+    } catch (error) {
+       
+        console.log(error)
+    }
+
+
+    next()
+}
 
 exports.protect = async (req, res, next) => {
     // user should already logged in
@@ -165,7 +204,7 @@ exports.protect = async (req, res, next) => {
     // 1) lets check of there is a token in the request headers
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        token = req.headers.authorization.split(' ')[1]
+        token = req.headers["authorization"]?.split(' ')[1]
     }
     if (!token) next(new Error('Your not logged in'))
 
@@ -187,32 +226,3 @@ exports.protect = async (req, res, next) => {
     next()
 }
 
-exports.adminOnly = async (req, res, next) => {
-    let token;
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        token = req.headers.authorization.split(' ')[1]
-    }
-    if (!token) next(new Error('Your not logged in'))
-
-    // 2) Now lets verify the token
-    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
-
-    const accessedTeacher = (await pool.query(`select user_id,name, approved from users where user_id=$1 and approved='true'`, [decoded.id])).rowCount
-
-    if (!accessedTeacher) {
-        return res.status(401).json({
-            status: 'Not authorized',
-            message: 'Your are not authorized for this task, please contact your school admin'
-        })
-    }
-
-    //===========
-    // Here for future I want to check if the password was changed after the token was issued
-    // and then reject the access request if the password was changed
-    //=========
-
-    //THEN NOW GRANT ACCESS TO PROJECTED ROUTE
-
-    req.user = accessedTeacher
-    next()
-}
