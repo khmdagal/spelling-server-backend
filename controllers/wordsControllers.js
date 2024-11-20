@@ -72,11 +72,25 @@ exports.createWeeklyPractice = async (req, res, next) => {
 exports.getWeeklyPracticeById = async (req, res, next) => {
     try {
         const { practice_id, school_id } = req.params
-        console.log({practice_id},{school_id})
-        const response = await pool.query(`select name,description,words from weeklypractice where practice_id=$1 and school_id=$2`, [practice_id,school_id]);
+        
+        const practiceId = await pool.query('select practice_id from weeklypractice where practice_id=$1', [practice_id])
+
+        if (practiceId.rowCount === 0) {
+            return res.status(404).json({ status: 'error', message: 'Practice not found, please use a valid practice id' })
+        }
+       
+        const existingPractice = practiceId.rows;
+        //const response = await pool.query(`select name,description,words from weeklypractice where practice_id=$1 and school_id=$2`, [practice_id, school_id]);
+
+        const response = await Promise.all(
+            existingPractice.map(async (practice) => {
+                return await pool.query('select name,description,words from weeklypractice where practice_id=$1 and school_id=$2', [practice.practice_id, school_id])
+            })
+        )
+        
         res.status(200).json({
             status: 'success',
-            myAssignment: response.rows[0]
+            myAssignment: response.map(result => result.rows[0])
         })
 
     } catch (error) {
