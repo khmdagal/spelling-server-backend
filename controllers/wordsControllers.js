@@ -1,9 +1,17 @@
 const pool = require('../utils/db/db')
+const { sanitizeInput } = require('../middlewares/inputSanitazation')
 
 exports.getWords = async (req, res, next) => {
 
     try {
+
         const selectedYears = req.params.yearsSelected;
+        if (sanitizeInput(selectedYears)) {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'Invalid input 💪💪'
+            })
+        }
         const words = await (await pool.query(`select  word_id, ${selectedYears} from spelling_table`)).rows
         res.status(200).json({
             status: 'success',
@@ -33,6 +41,13 @@ exports.getAllWeeklyPractice = async (req, res, next) => {
 };
 
 exports.createWeeklyPractice = async (req, res, next) => {
+
+    if (sanitizeInput(req.body)) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid input 💪💪'
+        })
+    }
 
     const practice = {
         name: req.body.name,
@@ -71,8 +86,17 @@ exports.createWeeklyPractice = async (req, res, next) => {
 
 exports.getWeeklyPracticeById = async (req, res, next) => {
     try {
-        const { practice_id, school_id } = req.params
+        console.log(req.params)
+
+        if (sanitizeInput(req.params)) {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'Invalid input 💪💪'
+            })
+        }
         
+        const { practice_id, school_id } = req.params
+
         const practiceId = await pool.query('select practice_id from weeklypractice where practice_id=$1', [practice_id])
 
         if (practiceId.rowCount === 0) {

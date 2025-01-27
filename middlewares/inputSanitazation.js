@@ -7,3 +7,25 @@ exports.validateSignUpInput = [
   body('school_id').notEmpty().isNumeric().withMessage('Not valid input'),
   body('email').isEmail().withMessage('Email is invalid')
 ];
+
+exports.sanitizeInput = (input) => {
+  let scannedInputData;
+  const dangerousInputs = /<[^>]+>/g
+
+  /*
+  First checking if the input is an array
+  Second checking if the input is an object
+  Lastly for strings
+  */
+  if (Array.isArray(input)) {
+    const allValuesToString = input.map(value => String(value))
+    scannedInputData = allValuesToString.some(value => value.match(dangerousInputs))
+  } else if (typeof input === 'object' && input !== null && !Array.isArray(input)) {
+    const getValuesAsArray = Object.values(input).map(value => String(value))
+    scannedInputData = getValuesAsArray.some(value => value.match(dangerousInputs))
+  } else {
+    scannedInputData = input.match(dangerousInputs)
+  }
+  return scannedInputData ? true : false
+}
+
