@@ -86,8 +86,7 @@ exports.createWeeklyPractice = async (req, res, next) => {
 
 exports.getWeeklyPracticeById = async (req, res, next) => {
     try {
-        console.log(req.params)
-
+        
         if (sanitizeInput(req.params)) {
             return res.status(404).json({
                 status: 'fail',
