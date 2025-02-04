@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const pool = require('../utils/db/db');
 const { validationResult } = require('express-validator');
 const { correctPassword } = require('../middlewares/helper');
+const { sanitizeInput } = require('../middlewares/inputSanitazation')
 
 const createJwtToken = (id) => {
     const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
@@ -17,8 +18,14 @@ const sendToken = async () => {
 
 exports.signUp = async (req, res, next) => {
     try {
-        // first checking the body request and validate
-        console.log("===Body data comes ===>>>", req.body)
+        // first checking any xss attacks
+        if (sanitizeInput(req.body)) {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'Invalid input 💪💪'
+            })
+        }
+
         const result = validationResult(req)
         console.log(result)
         if (!result.isEmpty()) {
@@ -88,8 +95,16 @@ exports.signUp = async (req, res, next) => {
 
 exports.logIn = async (req, res, next) => {
     try {
-        const { username, password } = req.body;
         
+        if (sanitizeInput(req.body)) {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'Invalid input 💪💪'
+            })
+        }
+        const { username, password } = req.body;
+
+
         // 1) check if username and password are not empty
         if (!username || !password) {
             res.status(401).send('Please provide username and password')
@@ -183,7 +198,7 @@ exports.adminOnly = async (req, res, next) => {
         req.user = accessedTeacher
 
     } catch (error) {
-       
+
         console.log(error)
     }
 
