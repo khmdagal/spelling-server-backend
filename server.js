@@ -1,7 +1,7 @@
 
 const dotenv = require('dotenv')
 dotenv.config()
-const app = require('./app')
+const app = require('./src/app') // Import app.js
 const port = 3500
 setTimeout(() => {
     console.log("DB is connected")

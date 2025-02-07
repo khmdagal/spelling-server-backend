@@ -1,10 +1,10 @@
 const bcrypt = require('bcryptjs')
 const { promisify } = require('util')
 const jwt = require('jsonwebtoken')
-const pool = require('../utils/db/db');
+const pool = require('.././utils/db/db');
 const { validationResult } = require('express-validator');
-const { correctPassword } = require('../middlewares/helper');
-const { sanitizeInput } = require('../middlewares/inputSanitazation')
+const { correctPassword} = require('.././middlewares/helper')
+const { sanitizeInput } = require('.././middlewares/inputSanitazation')
 
 const createJwtToken = (id) => {
     const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
@@ -95,7 +95,7 @@ exports.signUp = async (req, res, next) => {
 
 exports.logIn = async (req, res, next) => {
     try {
-        
+
         if (sanitizeInput(req.body)) {
             return res.status(404).json({
                 status: 'fail',

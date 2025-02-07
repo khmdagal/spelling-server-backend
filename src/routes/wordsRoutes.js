@@ -1,6 +1,6 @@
 const express = require('express');
-const { createWeeklyPractice, getWords, getAllWeeklyPractice, getWeeklyPracticeById } = require('../controllers/wordsControllers');
-const { protect, adminOnly } = require('../controllers/authControllers')
+const { createWeeklyPractice, getWords, getAllWeeklyPractice, getWeeklyPracticeById } = require('.././controllers/wordsControllers'); // Import from wordsControllers
+const { protect, adminOnly } = require('.././controllers/authControllers')
 const router = express.Router();
 
 

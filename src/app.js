@@ -2,9 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-const {corsOptions} = require('./middlewares/helper')
-const wordsRoutes = require('./routes/wordsRoutes')
-const usersRoutes = require('./routes/userRoutes')
+const { corsOptions } = require('./middlewares/helper')
+const wordsRoutes = require('././routes/wordsRoutes') // Import from wordsRoutes
+const usersRoutes = require('././routes/userRoutes') // Import from userRoutes
 
 app.use(express.json());
 

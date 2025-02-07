@@ -1,4 +1,4 @@
-const pool = require('../utils/db/db')
+const pool = require('.././utils/db/db')
 
 exports.getUsers = async (req, res, next) => {
 
