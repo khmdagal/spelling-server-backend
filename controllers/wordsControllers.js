@@ -12,7 +12,7 @@ exports.getWords = async (req, res, next) => {
                 message: 'Invalid input 💪💪'
             })
         }
-        const words = await (await pool.query(`select  word_id, ${selectedYears} from spelling_table`)).rows
+        const words = (await pool.query(`select * from words where class_year = $1`, [selectedYears])).rows
         res.status(200).json({
             status: 'success',
             words
@@ -50,28 +50,31 @@ exports.createWeeklyPractice = async (req, res, next) => {
     }
 
     const practice = {
-        name: req.body.name,
+        title: req.body.title,
         description: req.body.description,
         practice_id: req.body.practice_id,
         words: req.body.words,
         school_id: req.body.school_id,
-        class_id: req.body.class_id,
+        targetgroup: req.body.targetgroup,
         created_at: req.body.created_at,
         expires_in: req.body.expires_in
     }
 
+
     try {
         const createdPractice = await pool.query(`
-            insert into weeklypractice(practice_id,name,description,words,school_id,class_id,created_at,expires_in)
+            insert into weeklypractice(practice_id,title,description,words,school_id,targetgroup,created_at,expires_in)
             values($1,$2,$3,$4,$5,$6,$7,$8)
             `, [practice.practice_id,
-        practice.name,
+        practice.title,
         practice.description,
         practice.words,
         practice.school_id,
-        practice.class_id,
+        practice.targetgroup,
         practice.created_at,
         practice.expires_in])
+
+        
 
         return res.status(201).json({
             status: 'success',
@@ -79,6 +82,7 @@ exports.createWeeklyPractice = async (req, res, next) => {
         })
 
     } catch (error) {
+        console.log('Error creating practice:', error)
         res.send(error)
     }
     next()
