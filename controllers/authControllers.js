@@ -111,7 +111,7 @@ exports.logIn = async (req, res, next) => {
         }
 
         // 2) Check if the username exists
-        const userNameExist = (await pool.query(`select user_id, username, school_id, password, approved from users where username=$1`, [username]));
+        const userNameExist = (await pool.query(`select user_id, name, username, school_id, password, approved from users where username=$1`, [username]));
 
         if (userNameExist.rowCount === 0) {
             return res.status(401).json({
@@ -136,7 +136,8 @@ exports.logIn = async (req, res, next) => {
         const correctUserAccessed = {
             token: createJwtToken(userNameExist.rows[0].user_id),
             school_id: userNameExist.rows[0].school_id,
-            approved: userNameExist.rows[0].approved
+            approved: userNameExist.rows[0].approved,
+            name: userNameExist.rows[0].name
         }
         const cookiesOption = {
             expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
@@ -154,7 +155,8 @@ exports.logIn = async (req, res, next) => {
             status: 'success',
             token: correctUserAccessed.token,
             school_id: correctUserAccessed.school_id,
-            approved: correctUserAccessed.approved
+            approved: correctUserAccessed.approved,
+            name: correctUserAccessed.name
         })
 
     } catch (err) {
