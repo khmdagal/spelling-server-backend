@@ -27,7 +27,7 @@ exports.signUp = async (req, res, next) => {
         }
 
         const result = validationResult(req)
-        console.log(result)
+        
         if (!result.isEmpty()) {
             const errors = result.array().map((el) => {
                 return {
