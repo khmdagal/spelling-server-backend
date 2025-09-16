@@ -5,6 +5,6 @@ const { validateSignUpInput } = require('../middlewares/inputSanitazation')
 
 
 
-router.route('/schools').get(validateSignUpInput, getAllSchools)
+router.route('/').get(validateSignUpInput, getAllSchools)
 
 module.exports = router

@@ -18,6 +18,6 @@ app.use((req, res, next) => {
 // API endpoint
 app.use('/api/v1/spelling/words', wordsRoutes);
 app.use('/api/v1/spelling/users', usersRoutes);
-app.use('/api/v1/spelling', schoolsRoutes);
+app.use('/api/v1/spelling/schools', schoolsRoutes);
 
 module.exports = app
