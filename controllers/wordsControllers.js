@@ -155,7 +155,7 @@ exports.getWeeklyPracticeById = async (req, res, next) => {
 
         const response = await Promise.all(
             existingPractice.map(async (practice) => {
-                return await pool.query('select name,description,words from weeklypractice where practice_id=$1 and school_id=$2', [practice.practice_id, school_id])
+                return await pool.query('select * from weeklypractice where practice_id=$1 and school_id=$2', [practice.practice_id, school_id])
             })
         )
 
