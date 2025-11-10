@@ -12,9 +12,30 @@ const createJwtToken = (id) => {
 
 }
 
-const sendToken = async () => {
+const sendToken = (user, statusCode, res) => {
+    const token = createJwtToken(user.user_id);
 
-}
+    const cookieOptions = {
+        expires: new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+        ),
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+    };
+
+    // send cookie
+    res.cookie('jwt', token, cookieOptions);
+
+    // Optionally, don’t send token in response (for security)
+    res.status(statusCode).json({
+        status: 'success',
+        school_id: user.school_id,
+        approved: user.approved,
+        name: user.name,
+    });
+};
+
 
 exports.signUp = async (req, res, next) => {
     try {
@@ -27,7 +48,7 @@ exports.signUp = async (req, res, next) => {
         }
 
         const result = validationResult(req)
-        
+
         if (!result.isEmpty()) {
             const errors = result.array().map((el) => {
                 return {
@@ -95,7 +116,7 @@ exports.signUp = async (req, res, next) => {
 
 exports.logIn = async (req, res, next) => {
     try {
-        
+
         if (sanitizeInput(req.body)) {
             return res.status(404).json({
                 status: 'fail',
@@ -131,33 +152,11 @@ exports.logIn = async (req, res, next) => {
             });
         }
 
-        // 3 if request body not empty, and username exists and password is correct
+        const user = userNameExist.rows[0];
 
-        const correctUserAccessed = {
-            token: createJwtToken(userNameExist.rows[0].user_id),
-            school_id: userNameExist.rows[0].school_id,
-            approved: userNameExist.rows[0].approved,
-            name: userNameExist.rows[0].name
-        }
-        const cookiesOption = {
-            expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-            secure: true,
-            httpOnly: true
-        }
+        sendToken(user, 200, res);
 
-        if (process.env.NODE_ENV !== 'production') {
-            cookiesOption.secure = false
-        }
-
-        res.cookie('jwt', correctUserAccessed.token, cookiesOption)
-
-        res.status(200).json({
-            status: 'success',
-            token: correctUserAccessed.token,
-            school_id: correctUserAccessed.school_id,
-            approved: correctUserAccessed.approved,
-            name: correctUserAccessed.name
-        })
+        next();
 
     } catch (err) {
         console.error(err);
@@ -209,37 +208,75 @@ exports.adminOnly = async (req, res, next) => {
 }
 
 exports.protect = async (req, res, next) => {
-    // user should already logged in
-    // get the user_id from the token sent when the user login in
-    // check if the user_id is in the teacher table table
-    // check if the teacher is approved
-    // if the user exists and the and the teacher is approved the function should return true
+    try {
+        let token;
 
+        if (!token && req.cookies && req.cookies.jwt) {
+            token = req.cookies.jwt;
+        }
 
+        if (!token) {
+            return res.status(401).json({ status: 'fail', message: 'You are not logged in' });
+        }
 
-    //======
-    // 1) lets check of there is a token in the request headers
-    let token;
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        token = req.headers["authorization"]?.split(' ')[1]
+        const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+        const userQuery = await pool.query(`SELECT user_id, name, role, approved FROM users WHERE user_id=$1`, [decoded.id]);
+        const user = userQuery.rows[0];
+        if (!user) {
+            return res.status(401).json({ status: 'fail', message: 'User no longer exists' });
+        }
+
+        req.user = user; 
+        next();
+    } catch (err) {
+        console.error('Auth protect failed:', err);
+        res.status(401).json({ status: 'fail', message: 'Invalid or expired token' });
     }
-    if (!token) next(new Error('Your not logged in'))
-
-    // 2) Now lets verify the token
-    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
-    console.log("====>>>>", decoded)
-    const accessedUser = (await pool.query(`select user_id,name from users where user_id=$1`, [decoded.id])).rowCount
-    console.log('=+=+=+>>', accessedUser)
-    if (!accessedUser) next(new Error('User not exist'))
+};
 
 
-    //===========
-    // Here for future I want to check if the password was changed after the token was issued
-    // and then reject the access request if the password was changed
-    //=========
+exports.adminOnly = async (req, res, next) => {
+    await exports.protect(req, res, async (err) => {
+        if (err) return next(err);
 
-    //THEN NOW GRANT ACCESS TO PROJECTED ROUTE
-    req.user = accessedUser
-    next()
-}
+        if (req.user.role !== 'teacher') {
+            return res.status(403).json({ status: 'fail', message: 'Access denied — Teachers only' });
+        }
+        next();
+    });
+};
+
+exports.isLoggedIn = async (req, res) => {
+    try {
+        let token;
+        if (req.cookies && req.cookies.jwt) {
+            token = req.cookies.jwt;
+        }
+        if (!token) return res.status(401).json({ status: 'fail', message: 'Not logged in' });
+
+        const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+        const user = (await pool.query('SELECT user_id, approved FROM users WHERE user_id=$1', [decoded.id])).rows[0];
+
+        if (!user) return res.status(401).json({ status: 'fail', message: 'User no longer exists' });
+
+        console.log(`User ********** ${user.user_id} is authenticated`);
+
+        res.status(200).json({ status: 'authenticated', approved: user.approved });
+    } catch (err) {
+        res.status(401).json({ status: 'fail', message: 'Invalid token' });
+    }
+};
+
+exports.logout = (req, res) => {
+    
+    res.cookie('jwt', 'loggedout', {
+        expires: new Date(Date.now()),
+        httpOnly: true,
+        sameSite: 'None',
+        secure: process.env.NODE_ENV === 'production'
+    });
+
+    res.status(200).json({ status: 'success' });
+};
+
 
