@@ -259,8 +259,6 @@ exports.isLoggedIn = async (req, res) => {
 
         if (!user) return res.status(401).json({ status: 'fail', message: 'User no longer exists' });
 
-        console.log(`User ********** ${user.user_id} is authenticated`);
-
         res.status(200).json({ status: 'authenticated', approved: user.approved });
     } catch (err) {
         res.status(401).json({ status: 'fail', message: 'Invalid token' });
