@@ -1,5 +1,5 @@
-const bcrypt = require('bcryptjs')
-
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 exports.correctPassword = async (enteredPassword, storedPassword) => {
     const correct = await bcrypt.compare(enteredPassword, storedPassword);
@@ -22,3 +22,8 @@ exports.corsOptions = {
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 };
+
+
+exports.generateUUID = () => {
+    return crypto.randomBytes(16).toString('hex');
+}
