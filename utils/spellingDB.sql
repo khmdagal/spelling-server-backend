@@ -10,18 +10,28 @@ cascade;
 
 -- Create the schools table
 CREATE TABLE schools (
-    school_id SERIAL PRIMARY KEY NOT NULL,
-    school_name VARCHAR(255) UNIQUE NOT NULL,
+    school_id VARCHAR(255) PRIMARY KEY,
+    school_name VARCHAR(255) NOT NULL,
     email VARCHAR(255),
-    phone_number VARCHAR(255) UNIQUE,
-	website varchar(150)
+    phone_number VARCHAR(50),
+    website VARCHAR(150),
+    address_line1 VARCHAR(255),
+    city VARCHAR(100),
+    postcode VARCHAR(20),
+    latitude DECIMAL(10, 7),
+    longitude DECIMAL(10, 7),
+    school_type VARCHAR(100),
+    urn VARCHAR(50) UNIQUE,
+    UNIQUE (school_name, postcode)
 );
+
 
 --Create classes table
 CREATE TABLE classes (
-    class_id SERIAL PRIMARY KEY,
+    class_id VARCHAR(255) PRIMARY KEY,
     class_name VARCHAR(255) NOT NULL,
-    school_id INT NOT NULL,
+    school_id VARCHAR(255) NOT NULL,
+    enrolled_students INT,
     CONSTRAINT fk_school
         FOREIGN KEY(school_id)
         REFERENCES schools(school_id)
@@ -30,8 +40,8 @@ CREATE TABLE classes (
 
 -- Create the weeklyspellingpractice table
 CREATE TABLE weeklypractice (
-practice_id VARCHAR(255) PRIMARY KEY NOT NULL,
-school_id INT,
+practice_id VARCHAR(255) PRIMARY KEY,
+school_id VARCHAR(255),
 assignment JSONB,
 CONSTRAINT fk_school
         FOREIGN KEY(school_id) 
@@ -42,13 +52,13 @@ CONSTRAINT fk_school
 
 -- Create users table
 CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
+    user_id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     username VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    role VARCHAR(100) NOT NULL, -- can be 'teacher' or 'student'
-    school_id INT NOT NULL,
-	email VARCHAR(100),
+    role VARCHAR(100) NOT NULL, 
+    school_id VARCHAR(255) NOT NULL,
+	  email VARCHAR(100),
     approved BOOLEAN NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_school
@@ -59,27 +69,97 @@ CREATE TABLE users (
 
 -- Create sessions table
 CREATE TABLE sessions (
-    session_id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL,
-    correctWordsList TEXT[],   -- Array type for storing lists of words
-    wrongWordsList TEXT[],     -- Array type for storing lists of words
-    number_of_correct_words INT NOT NULL,
-    number_of_incorrect_words INT NOT NULL,
-    session_accuracy_percentage NUMERIC(5,2),
-    percentage_sign VARCHAR(1) DEFAULT '%',
+    session_id VARCHAR(255) PRIMARY KEY,
+    user_id VARCHAR(255),
+    practice_id VARCHAR(255) NOT NULL,
+    school_id VARCHAR(255) NOT NULL,
+
+    sessionData JSONB,
+    session_score INT NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     CONSTRAINT fk_user
         FOREIGN KEY (user_id)
         REFERENCES users (user_id)
-        ON DELETE SET NULL
+        ON DELETE SET NULL,
+
+    CONSTRAINT fk_practice
+        FOREIGN KEY (practice_id)
+        REFERENCES weeklypractice (practice_id)
+        ON DELETE CASCADE,
+        
+    CONSTRAINT fk_school
+        FOREIGN KEY (school_id)
+        REFERENCES schools (school_id)
+        ON DELETE CASCADE
 );
 
--- Create words table
-CREATE TABLE words(
+
+CREATE TABLE words (
 word_id serial PRIMARY KEY,
 word varchar(100),
 class_year varchar(20),
 example JSONB
 );
+
+CREATE TABLE userprofile (
+    profile_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id VARCHAR(255) UNIQUE NOT NULL,
+    practice_rank INT NOT NULL,
+    avatar_name VARCHAR(255),
+
+    CONSTRAINT fk_profile_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE avatars (
+	avatar_id UUID PRIMARY KEY  DEFAULT gen_random_uuid(),
+	avatar_name VARCHAR(255) UNIQUE NOT NULL
+)
+
+CREATE TABLE leaderBoard (
+    user_profile_id VARCHAR(255) PRIMARY KEY,
+
+    total_sessions_per_practice_id INT NOT NULL,
+    ttotal_score_per_practice_id INT NOT NULL,
+    total_incorrect_words_per_practice_id INT NOT NULL,
+
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_leaderboard_profile
+        FOREIGN KEY (user_profile_id)
+        REFERENCES userProfile(profile_id)
+        ON DELETE CASCADE
+);
+
+
+-- avatar 
+
+INSERT INTO avatars (avatar_name)
+VALUES
+('Adventurer'),
+('Avataaars'),
+('Adventurer Neutral'),
+('Face Generator'),
+('Custom Avatar'),
+('Bottts'),
+('Croodles - Doodle your face'),
+('Fun Emoji Set'),
+('Bootstrap Icons'),
+('Identicon'),
+('Lorelei'),
+('Lorelei Neutral'),
+('Avatar Illustration System'),
+('Miniavs - Free Avatar Creator'),
+('Open Peeps'),
+('Personas by Draftbit'),
+('Pixel Art'),
+('Pixel Art Neutral'),
+('Shapes'),
+('Thumbs');
 
 -- Create spelling_table
 

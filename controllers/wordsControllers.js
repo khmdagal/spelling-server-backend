@@ -73,11 +73,25 @@ exports.updateExampleSentence = async (req, res, next) => {
 
 exports.getAllWeeklyPractice = async (req, res, next) => {
     try {
-        const result = (await pool.query(`SELECT * FROM weeklypractice`)).rows
+
+        if (sanitizeInput(req.params)) {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'Invalid input 💪💪'
+            })
+        }
+
+        const { school_id } = req.params
+
+        const result = (await pool.query(`SELECT * FROM weeklypractice where school_id=$1`, [school_id])).rows
+
+        const currentTime = new Date().getTime()
+
+        const validAssignments = result.filter(el => new Date(el.assignment.expires_in).getTime() > currentTime)
 
         res.status(200).json({
             status: 'success',
-            assignments: result
+            assignments: validAssignments
         });
 
 
@@ -86,6 +100,7 @@ exports.getAllWeeklyPractice = async (req, res, next) => {
     }
     next()
 };
+
 
 exports.createWeeklyPractice = async (req, res, next) => {
 
@@ -109,7 +124,7 @@ exports.createWeeklyPractice = async (req, res, next) => {
         }
     }
 
-    
+
     try {
         const createdPractice = await pool.query(`
             insert into weeklypractice(practice_id, school_id, assignment)

@@ -1,15 +1,20 @@
 const bcrypt = require('bcryptjs')
+const crypto = require('crypto');
 const { promisify } = require('util')
 const jwt = require('jsonwebtoken')
+
 const pool = require('../utils/db/db');
 const { validationResult } = require('express-validator');
 const { correctPassword } = require('../middlewares/helper');
-const { sanitizeInput } = require('../middlewares/inputSanitazation')
+const { sanitizeInput } = require('../middlewares/inputSanitazation');
 
 const createJwtToken = (id) => {
     const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
     return token
 
+}
+const generateUUID = () => {
+    return crypto.randomBytes(16).toString('hex');
 }
 
 const sendToken = (user, statusCode, res) => {
@@ -76,34 +81,44 @@ exports.signUp = async (req, res, next) => {
         // hashing the password and store the DB hashed password
         const hashedPassword = await bcrypt.hash(req.body.password, 12)
 
+        const newUserId = String(generateUUID())
+
+        console.log({ newUserId });
+
         const cleanNewUserData = {
-            name: req.body.name, //1
-            username: req.body.username, //2
-            password: hashedPassword, //3
-            role: req.body.role, //4
-            school_id: req.body.school_id, //5
-            email: req.body.email, //6
-            approved: req.body.approved, //7
-            created_at: new Date() //8
+            user_id: newUserId,
+            name: req.body.name,
+            username: req.body.username,
+            password: hashedPassword,
+            role: req.body.role,
+            school_id: req.body.school_id,
+            email: req.body.email,
+            approved: req.body.approved,
+            created_at: new Date()
         }
 
         //creating the new user when the data passes the above checks
-        pool.query(`insert into users(name,username,password,role,school_id,email,approved,created_at) 
-                values($1,$2,$3,$4,$5,$6,$7,$8)             
-    `, [cleanNewUserData.name,
-        cleanNewUserData.username,
-        cleanNewUserData.password,
-        cleanNewUserData.role,
-        cleanNewUserData.school_id,
-        cleanNewUserData.email,
-        cleanNewUserData.approved,
-        cleanNewUserData.created_at])
+        pool.query(`insert into users(user_id,name,username,password,role,school_id,email,approved,created_at) 
+                values($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+            [cleanNewUserData.user_id,
+            cleanNewUserData.name,
+            cleanNewUserData.username,
+            cleanNewUserData.password,
+            cleanNewUserData.role,
+            cleanNewUserData.school_id,
+            cleanNewUserData.email,
+            cleanNewUserData.approved,
+            cleanNewUserData.created_at])
 
+
+        console.log('==>>>', cleanNewUserData.user_id)
 
         res.status(201).json({
             status: 'succuss',
             data: cleanNewUserData
         })
+
+
         next()
     } catch (err) {
         console.error(err);
@@ -125,6 +140,7 @@ exports.logIn = async (req, res, next) => {
         }
         const { username, password } = req.body;
 
+        console.log('===>>', username, password)
 
         // 1) check if username and password are not empty
         if (!username || !password) {
@@ -166,46 +182,7 @@ exports.logIn = async (req, res, next) => {
 
 };
 
-exports.adminOnly = async (req, res, next) => {
 
-    try {
-        let token;
-        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-            token = req.headers["authorization"]?.split(' ')[1]
-        }
-        if (!token) next(new Error('Your not logged in'))
-
-        // 2) Now lets verify the token
-
-        const decoded = await jwt.verify(token, process.env.JWT_SECRET)
-        // promisify(jwt.verify)(token, process.env.JWT_SECRET)
-
-        const accessedTeacher = (await pool.query(`select user_id,name, approved from users where user_id=$1 and approved='true'`, [decoded.id])).rowCount
-
-        if (!accessedTeacher) {
-            return res.status(401).json({
-                status: 'Not authorized',
-                message: 'Your are not authorized for this task, please contact your school admin'
-            })
-        }
-
-        //===========
-        // Here for future I want to check if the password was changed after the token was issued
-        // and then reject the access request if the password was changed
-        //=========
-
-        //THEN NOW GRANT ACCESS TO PROJECTED ROUTE
-
-        req.user = accessedTeacher
-
-    } catch (error) {
-
-        console.log(error)
-    }
-
-
-    next()
-}
 
 exports.protect = async (req, res, next) => {
     try {
@@ -215,19 +192,23 @@ exports.protect = async (req, res, next) => {
             token = req.cookies.jwt;
         }
 
+       
         if (!token) {
             return res.status(401).json({ status: 'fail', message: 'You are not logged in' });
         }
 
         const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
         const userQuery = await pool.query(`SELECT user_id, name, role, approved FROM users WHERE user_id=$1`, [decoded.id]);
         const user = userQuery.rows[0];
+        
         if (!user) {
             return res.status(401).json({ status: 'fail', message: 'User no longer exists' });
         }
 
-        req.user = user; 
+        req.user = user;
         next();
+
     } catch (err) {
         console.error('Auth protect failed:', err);
         res.status(401).json({ status: 'fail', message: 'Invalid or expired token' });
@@ -236,10 +217,13 @@ exports.protect = async (req, res, next) => {
 
 
 exports.adminOnly = async (req, res, next) => {
+
     await exports.protect(req, res, async (err) => {
+        
         if (err) return next(err);
 
-        if (req.user.role !== 'teacher') {
+        if (!req.user.approved) {
+          
             return res.status(403).json({ status: 'fail', message: 'Access denied — Teachers only' });
         }
         next();
@@ -259,22 +243,17 @@ exports.isLoggedIn = async (req, res) => {
 
         if (!user) return res.status(401).json({ status: 'fail', message: 'User no longer exists' });
 
-        res.status(200).json({ status: 'authenticated', approved: user.approved });
+        res.status(200).json({ status: 'authenticated', admin: user.approved });
+
     } catch (err) {
         res.status(401).json({ status: 'fail', message: 'Invalid token' });
     }
 };
 
 exports.logout = (req, res) => {
-    
-    res.cookie('jwt', 'loggedout', {
-        expires: new Date(Date.now()),
-        httpOnly: true,
-        sameSite: 'None',
-        secure: process.env.NODE_ENV === 'production'
-    });
-
-    res.status(200).json({ status: 'success' });
+    res.status(200)
+    .clearCookie('jwt')
+    .json({ status: 'loggedout' });
 };
 
 
