@@ -2,7 +2,7 @@
 const dotenv = require('dotenv')
 dotenv.config()
 const app = require('./app')
-const port = 3500
+const port = 8080
 setTimeout(() => {
     console.log("DB is connected")
 }, 2000)
