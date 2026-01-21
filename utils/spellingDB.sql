@@ -1,14 +1,16 @@
 -- Drop existing tables if they exist
 DROP TABLE IF EXISTS 
-weeklypractice,
 schools,
+classes,
+weeklypractice,
 users,
 sessions,
-spelling_table,
-classes,
+words,
+userprofile,
+avatars,
+leaderBoard,
 cascade;
 
--- Create the schools table
 CREATE TABLE schools (
     school_id VARCHAR(255) PRIMARY KEY,
     school_name VARCHAR(255) NOT NULL,
@@ -25,8 +27,6 @@ CREATE TABLE schools (
     UNIQUE (school_name, postcode)
 );
 
-
---Create classes table
 CREATE TABLE classes (
     class_id VARCHAR(255) PRIMARY KEY,
     class_name VARCHAR(255) NOT NULL,
@@ -38,7 +38,6 @@ CREATE TABLE classes (
         ON DELETE SET NULL
 );
 
--- Create the weeklyspellingpractice table
 CREATE TABLE weeklypractice (
 practice_id VARCHAR(255) PRIMARY KEY,
 school_id VARCHAR(255),
@@ -49,8 +48,6 @@ CONSTRAINT fk_school
         ON DELETE SET NULL
 );
 
-
--- Create users table
 CREATE TABLE users (
     user_id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -67,7 +64,6 @@ CREATE TABLE users (
         ON DELETE SET NULL
 );
 
--- Create sessions table
 CREATE TABLE sessions (
     session_id VARCHAR(255) PRIMARY KEY,
     user_id VARCHAR(255),
@@ -95,7 +91,6 @@ CREATE TABLE sessions (
         ON DELETE CASCADE
 );
 
-
 CREATE TABLE words (
 word_id serial PRIMARY KEY,
 word varchar(100),
@@ -118,10 +113,10 @@ CREATE TABLE userprofile (
 CREATE TABLE avatars (
 	avatar_id UUID PRIMARY KEY  DEFAULT gen_random_uuid(),
 	avatar_name VARCHAR(255) UNIQUE NOT NULL
-)
+);
 
 CREATE TABLE leaderBoard (
-    user_profile_id VARCHAR(255) PRIMARY KEY,
+    profile_id UUID PRIMARY KEY,
 
     total_sessions_per_practice_id INT NOT NULL,
     ttotal_score_per_practice_id INT NOT NULL,
@@ -130,13 +125,67 @@ CREATE TABLE leaderBoard (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_leaderboard_profile
-        FOREIGN KEY (user_profile_id)
-        REFERENCES userProfile(profile_id)
+        FOREIGN KEY (profile_id)
+        REFERENCES userprofile(profile_id)
         ON DELETE CASCADE
 );
 
-
--- avatar 
+INSERT INTO schools (
+    school_id,
+    school_name,
+    email,
+    phone_number,
+    website,
+    address_line1,
+    city,
+    postcode,
+    latitude,
+    longitude,
+    school_type,
+    urn
+) VALUES
+(
+    'c8fca0a3-7f50-4c30-9378-334b51b1b26b',
+    'Lawrence Primary School',
+    'contact@lawrenceprimary.co.uk',
+    '01234 567890',
+    'https://lawrenceprimary.co.uk',
+    '123 Oak Street',
+    'London',
+    'W1A 1AA',
+    51.5074000,
+    -0.1278000,
+    'Primary',
+    '1234567'
+),
+(
+    '9a2b1f6e-2c44-4c1b-ae88-4e8a6d3c2f11',
+    'Riverside Academy',
+    'info@riversideacademy.org',
+    '020 7946 0123',
+    'https://riversideacademy.org',
+    '45 River Road',
+    'Manchester',
+    'M1 2AB',
+    53.4808000,
+    -2.2426000,
+    'Secondary',
+    '2345678'
+),
+(
+    'f4d7b9a1-1e6a-4d8c-9b9f-7c5e8a2d9c44',
+    'Hilltop Community School',
+    'admin@hilltopschool.sch.uk',
+    '0117 496 0789',
+    'https://hilltopschool.sch.uk',
+    '78 Summit Lane',
+    'Bristol',
+    'BS1 5TL',
+    51.4545000,
+    -2.5879000,
+    'Primary',
+    '3456789'
+);
 
 INSERT INTO avatars (avatar_name)
 VALUES
@@ -160,8 +209,6 @@ VALUES
 ('Pixel Art Neutral'),
 ('Shapes'),
 ('Thumbs');
-
--- Create spelling_table
 
 INSERT INTO words (word, class_year, example) VALUES
 ('accident', 'y3and4words', '{
