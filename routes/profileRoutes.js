@@ -6,7 +6,7 @@ const {createProfile,getProfile,updateProfile,deleteProfile} = require ('../cont
 
 
 router.route('/createProfile').post(isLoggedIn,protect, createProfile)
-router.route('/getProfile').get( protect, getProfile)
+router.route('/getProfile').get(protect, getProfile)
 router.route('/updateProfile/:profile_id').put(protect,updateProfile);
 router.route('deleteProfile/:profile_id').delete(adminOnly,deleteProfile);
 
