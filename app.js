@@ -16,6 +16,7 @@ const profileRoutes = require('./routes/profileRoutes')
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions))
 
 app.use((req, res, next) => {
     next()

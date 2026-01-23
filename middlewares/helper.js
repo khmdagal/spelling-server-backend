@@ -11,11 +11,11 @@ const allowedOrigins = ['https://pwa-myspelling-prod-app.netlify.app', 'https://
 exports.corsOptions = {
     origin: function (origin, callback) {
         if(!origin){
-            callback(null,true)
+           return callback(null,true)
         }
         
         if (origin && !allowedOrigins.includes(origin)) { 
-            callback(new Error('Not allowed 💪💪'), false);
+           return callback(new Error('Not allowed 💪💪'), false);
         }
 
         return callback(null, true); 
