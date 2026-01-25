@@ -1,5 +1,5 @@
 const pool = require('../utils/db/db')
-const {body, validationResult } = require('express-validator');
+const { body, validationResult } = require('express-validator');
 const { generateUUID } = require('../middlewares/helper')
 
 const { sanitizeInput } = require('../middlewares/inputSanitazation');
@@ -89,42 +89,43 @@ exports.getAllClassBySchool = async (req, res, next) => {
 }
 
 exports.createClass = async (req, res, next) => {
-    const { schoolId } = req.params
-
-    if (sanitizeInput(req.params)) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid input 💪💪'
-        })
-    }
-
-    if (sanitizeInput(req.body)) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid input 💪💪'
-        })
-    }
-
-    const result = validationResult(body)
-
-    if (!result.isEmpty()) {
-        const errors = result.array().map((el) => {
-            return {
-                message: el.msg,
-                field: el.path
-            }
-        })
-
-        return res.status(400).json({
-            status: 'fail',
-            message: errors
-        })
-    }
-
-    const newClassId = String(generateUUID())
+    const client = await pool.connect();
 
     try {
-        const response = (await pool.query(`select school_id from schools where school_id=$1`, [schoolId]))
+        const { schoolId } = req.params
+
+        if (sanitizeInput(req.params)) {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'Invalid input 💪💪'
+            })
+        }
+
+        if (sanitizeInput(req.body)) {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'Invalid input 💪💪'
+            })
+        }
+
+        const result = validationResult(body)
+
+        if (!result.isEmpty()) {
+            const errors = result.array().map((el) => {
+                return {
+                    message: el.msg,
+                    field: el.path
+                }
+            })
+
+            return res.status(400).json({
+                status: 'fail',
+                message: errors
+            })
+        }
+
+        const newClassId = String(generateUUID())
+        const response = (await client.query(`select school_id from schools where school_id=$1`, [schoolId]))
 
         if (response.rowCount === 0) {
             return res.status(404).json({ status: 'error', message: 'Not found, please use a valid school id' })
@@ -139,7 +140,7 @@ exports.createClass = async (req, res, next) => {
             enrolled_students: req.body.enrolled_students
         }
 
-        const classes = (await pool.query(`insert into classes(class_id, class_name, school_id, enrolled_students) 
+        const classes = (await client.query(`insert into classes(class_id, class_name, school_id, enrolled_students) 
             values ($1,$2,$3,$4)`,
             [newCleanClassData.class_id,
             newCleanClassData.class_name,
@@ -155,5 +156,7 @@ exports.createClass = async (req, res, next) => {
     } catch (error) {
         console.log(error)
         next(error)
+    } finally {
+        client.release();
     }
 }
