@@ -140,7 +140,6 @@ exports.logIn = async (req, res, next) => {
         }
         const { username, password } = req.body;
 
-        console.log('===>>', username, password)
 
         // 1) check if username and password are not empty
         if (!username || !password) {
