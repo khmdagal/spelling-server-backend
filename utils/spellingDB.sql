@@ -101,7 +101,7 @@ example JSONB
 CREATE TABLE userprofile (
     profile_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id VARCHAR(255) UNIQUE NOT NULL,
-    practice_rank INT NOT NULL,
+    practice_rank INT,
     avatar_name VARCHAR(255),
 
     CONSTRAINT fk_profile_user
