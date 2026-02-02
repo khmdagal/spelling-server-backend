@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.route('/:yearsSelected').get(adminOnly, getWords)
 router.route('/weeklypractice').post(adminOnly, createWeeklyPractice)
-router.route('/myweeklypractice/all/:school_id').get(protect, getAllWeeklyPractice)
+router.route('/weeklypractice/all/:school_id').get(protect, getAllWeeklyPractice)
 router.route('/myweeklypractice/:practice_id/:school_id').get(protect, getWeeklyPracticeById)
 router.route('/:word_id/example').put(adminOnly, updateExampleSentence)
 module.exports = router

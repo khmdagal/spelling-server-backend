@@ -101,7 +101,7 @@ example JSONB
 CREATE TABLE userprofile (
     profile_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id VARCHAR(255) UNIQUE NOT NULL,
-    practice_rank INT NOT NULL,
+    practice_rank INT,
     avatar_name VARCHAR(255),
 
     CONSTRAINT fk_profile_user
@@ -1239,4 +1239,440 @@ INSERT INTO words (word, class_year, example) VALUES
 ('yacht', 'y5and6words', '{
   "example1": "We saw a big yacht sailing in the harbour.",
   "example2": "The yacht had tall white sails."
+}'::jsonb),
+('the', 'yr1words', '{
+  "example1": "The cat is sleeping.",
+  "example2": "I see the sun in the sky."
+}'::jsonb),
+('a', 'yr1words', '{
+  "example1": "I saw a dog in the park.",
+  "example2": "She has a red ball."
+}'::jsonb),
+('do', 'yr1words', '{
+  "example1": "I can do my homework.",
+  "example2": "Please do your best."
+}'::jsonb),
+('to', 'yr1words', '{
+  "example1": "I like to read books.",
+  "example2": "We are going to school."
+}'::jsonb),
+('today', 'yr1words', '{
+  "example1": "I am happy today.",
+  "example2": "Today is my birthday."
+}'::jsonb),
+('of', 'yr1words', '{
+  "example1": "A cup of water is on the table.",
+  "example2": "The color of the sky is blue."
+}'::jsonb),
+('said', 'yr1words', '{
+  "example1": "She said hello to me.",
+  "example2": "Dad said it is time to eat."
+}'::jsonb),
+('says', 'yr1words', '{
+  "example1": "The sign says stop.",
+  "example2": "Mom says I can play."
+}'::jsonb),
+('are', 'yr1words', '{
+  "example1": "We are friends.",
+  "example2": "The toys are new."
+}'::jsonb),
+('were', 'yr1words', '{
+  "example1": "We were at the park.",
+  "example2": "The birds were loud."
+}'::jsonb),
+('was', 'yr1words', '{
+  "example1": "He was happy.",
+  "example2": "It was a sunny day."
+}'::jsonb),
+('is', 'yr1words', '{
+  "example1": "She is my friend.",
+  "example2": "The dog is small."
+}'::jsonb),
+('his', 'yr1words', '{
+  "example1": "This is his hat.",
+  "example2": "He lost his shoe."
+}'::jsonb),
+('has', 'yr1words', '{
+  "example1": "She has a cat.",
+  "example2": "Tom has a blue bag."
+}'::jsonb),
+('I', 'yr1words', '{
+  "example1": "I like apples.",
+  "example2": "I can run fast."
+}'::jsonb),
+('you', 'yr1words', '{
+  "example1": "You are my friend.",
+  "example2": "Can you help me?"
+}'::jsonb),
+('your', 'yr1words', '{
+  "example1": "This is your book.",
+  "example2": "I like your drawing."
+}'::jsonb),
+('they', 'yr1words', '{
+  "example1": "They are playing.",
+  "example2": "They like ice cream."
+}'::jsonb),
+('be', 'yr1words', '{
+  "example1": "I want to be kind.",
+  "example2": "Please be quiet."
+}'::jsonb),
+('he', 'yr1words', '{
+  "example1": "He is my brother.",
+  "example2": "He can jump high."
+}'::jsonb),
+('me', 'yr1words', '{
+  "example1": "Come with me.",
+  "example2": "She gave me a hug."
+}'::jsonb),
+('she', 'yr1words', '{
+  "example1": "She is my teacher.",
+  "example2": "She likes to read."
+}'::jsonb),
+('we', 'yr1words', '{
+  "example1": "We are learning.",
+  "example2": "We like to play."
+}'::jsonb),
+('no', 'yr1words', '{
+  "example1": "No, thank you.",
+  "example2": "There is no milk left."
+}'::jsonb),
+('go', 'yr1words', '{
+  "example1": "Let us go home.",
+  "example2": "Go and wash your hands."
+}'::jsonb),
+('so', 'yr1words', '{
+  "example1": "I was tired so I slept.",
+  "example2": "It is cold so wear a coat."
+}'::jsonb),
+('by', 'yr1words', '{
+  "example1": "Sit by me.",
+  "example2": "The book is by the bed."
+}'::jsonb),
+('my', 'yr1words', '{
+  "example1": "This is my toy.",
+  "example2": "My name is Sam."
+}'::jsonb),
+('here', 'yr1words', '{
+  "example1": "Come here please.",
+  "example2": "I am here."
+}'::jsonb),
+('there', 'yr1words', '{
+  "example1": "Put it there.",
+  "example2": "The park is over there."
+}'::jsonb),
+('where', 'yr1words', '{
+  "example1": "Where is my bag?",
+  "example2": "Do you know where she is?"
+}'::jsonb),
+('love', 'yr1words', '{
+  "example1": "I love my family.",
+  "example2": "We love to play."
+}'::jsonb),
+('come', 'yr1words', '{
+  "example1": "Come with me.",
+  "example2": "Please come here."
+}'::jsonb),
+('some', 'yr1words', '{
+  "example1": "I want some water.",
+  "example2": "She ate some fruit."
+}'::jsonb),
+('one', 'yr1words', '{
+  "example1": "I have one apple.",
+  "example2": "Pick one toy."
+}'::jsonb),
+('once', 'yr1words', '{
+  "example1": "Once upon a time.",
+  "example2": "I once saw a big dog."
+}'::jsonb),
+('ask', 'yr1words', '{
+  "example1": "Ask the teacher.",
+  "example2": "You can ask for help."
+}'::jsonb),
+('friend', 'yr1words', '{
+  "example1": "She is my friend.",
+  "example2": "I play with my friend."
+}'::jsonb),
+('school', 'yr1words', '{
+  "example1": "I go to school.",
+  "example2": "School is fun."
+}'::jsonb),
+('put', 'yr1words', '{
+  "example1": "Put the toy away.",
+  "example2": "Put your shoes on."
+}'::jsonb),
+('push', 'yr1words', '{
+  "example1": "Push the door.",
+  "example2": "Do not push people."
+}'::jsonb),
+('pull', 'yr1words', '{
+  "example1": "Pull the rope.",
+  "example2": "Please pull the handle."
+}'::jsonb),
+('full', 'yr1words', '{
+  "example1": "My cup is full.",
+  "example2": "The bus is full."
+}'::jsonb),
+('house', 'yr1words', '{
+  "example1": "This is my house.",
+  "example2": "The house is big."
+}'::jsonb),
+('our', 'yr1words', '{
+  "example1": "This is our home.",
+  "example2": "Our teacher is nice."
+}'::jsonb),
+('door', 'yr2words', '{
+  "example1": "Please close the door.",
+  "example2": "The door is blue."
+}'::jsonb),
+('floor', 'yr2words', '{
+  "example1": "The toy is on the floor.",
+  "example2": "Sit on the floor."
+}'::jsonb),
+('poor', 'yr2words', '{
+  "example1": "The poor cat was cold.",
+  "example2": "He felt poor without his toy."
+}'::jsonb),
+('because', 'yr2words', '{
+  "example1": "I stayed inside because it rained.",
+  "example2": "She was happy because she won."
+}'::jsonb),
+('find', 'yr2words', '{
+  "example1": "Can you find my shoe?",
+  "example2": "I find my book on the table."
+}'::jsonb),
+('kind', 'yr2words', '{
+  "example1": "She is kind to everyone.",
+  "example2": "Be kind to your friends."
+}'::jsonb),
+('mind', 'yr2words', '{
+  "example1": "I changed my mind.",
+  "example2": "Do you mind if I sit here?"
+}'::jsonb),
+('behind', 'yr2words', '{
+  "example1": "The cat hid behind the chair.",
+  "example2": "Stand behind me."
+}'::jsonb),
+('child', 'yr2words', '{
+  "example1": "The child is playing.",
+  "example2": "Every child needs rest."
+}'::jsonb),
+('children', 'yr2words', '{
+  "example1": "The children are happy.",
+  "example2": "Children like to play."
+}'::jsonb),
+('wild', 'yr2words', '{
+  "example1": "The wild animals ran fast.",
+  "example2": "He has wild hair."
+}'::jsonb),
+('climb', 'yr2words', '{
+  "example1": "I can climb the tree.",
+  "example2": "They climb the hill."
+}'::jsonb),
+('most', 'yr2words', '{
+  "example1": "Most children like games.",
+  "example2": "I ate most of my lunch."
+}'::jsonb),
+('only', 'yr2words', '{
+  "example1": "I have only one apple.",
+  "example2": "She is the only one here."
+}'::jsonb),
+('both', 'yr2words', '{
+  "example1": "Both dogs are small.",
+  "example2": "We like both colours."
+}'::jsonb),
+('old', 'yr2words', '{
+  "example1": "The house is old.",
+  "example2": "My grandad is old."
+}'::jsonb),
+('cold', 'yr2words', '{
+  "example1": "It is cold today.",
+  "example2": "My hands are cold."
+}'::jsonb),
+('gold', 'yr2words', '{
+  "example1": "The ring is gold.",
+  "example2": "She won a gold medal."
+}'::jsonb),
+('hold', 'yr2words', '{
+  "example1": "Hold my hand.",
+  "example2": "Please hold the door."
+}'::jsonb),
+('told', 'yr2words', '{
+  "example1": "She told me a story.",
+  "example2": "Dad told me to wait."
+}'::jsonb),
+('every', 'yr2words', '{
+  "example1": "I read every day.",
+  "example2": "Every child smiled."
+}'::jsonb),
+('everybody', 'yr2words', '{
+  "example1": "Everybody was excited.",
+  "example2": "Everybody likes games."
+}'::jsonb),
+('even', 'yr2words', '{
+  "example1": "It was even colder at night.",
+  "example2": "She did not even try."
+}'::jsonb),
+('great', 'yr2words', '{
+  "example1": "We had a great day.",
+  "example2": "That is a great idea."
+}'::jsonb),
+('break', 'yr2words', '{
+  "example1": "Do not break the toy.",
+  "example2": "We have a break at school."
+}'::jsonb),
+('steak', 'yr2words', '{
+  "example1": "Dad cooked a steak.",
+  "example2": "The steak was hot."
+}'::jsonb),
+('pretty', 'yr2words', '{
+  "example1": "The flower is pretty.",
+  "example2": "She has a pretty dress."
+}'::jsonb),
+('beautiful', 'yr2words', '{
+  "example1": "The garden is beautiful.",
+  "example2": "It was a beautiful day."
+}'::jsonb),
+('after', 'yr2words', '{
+  "example1": "We played after school.",
+  "example2": "Wash your hands after lunch."
+}'::jsonb),
+('fast', 'yr2words', '{
+  "example1": "The car is fast.",
+  "example2": "He can run fast."
+}'::jsonb),
+('last', 'yr2words', '{
+  "example1": "This is the last one.",
+  "example2": "I was last in line."
+}'::jsonb),
+('past', 'yr2words', '{
+  "example1": "We walked past the shop.",
+  "example2": "That is in the past."
+}'::jsonb),
+('father', 'yr2words', '{
+  "example1": "My father is kind.",
+  "example2": "Her father is tall."
+}'::jsonb),
+('class', 'yr2words', '{
+  "example1": "Our class is quiet.",
+  "example2": "The class starts now."
+}'::jsonb),
+('grass', 'yr2words', '{
+  "example1": "The grass is green.",
+  "example2": "Do not walk on the grass."
+}'::jsonb),
+('pass', 'yr2words', '{
+  "example1": "Please pass the ball.",
+  "example2": "I will pass the test."
+}'::jsonb),
+('plant', 'yr2words', '{
+  "example1": "We plant seeds.",
+  "example2": "The plant needs water."
+}'::jsonb),
+('path', 'yr2words', '{
+  "example1": "Follow the path.",
+  "example2": "The path is muddy."
+}'::jsonb),
+('bath', 'yr2words', '{
+  "example1": "I have a bath at night.",
+  "example2": "The bath is warm."
+}'::jsonb),
+('hour', 'yr2words', '{
+  "example1": "We waited an hour.",
+  "example2": "The lesson is one hour."
+}'::jsonb),
+('move', 'yr2words', '{
+  "example1": "Please move aside.",
+  "example2": "The car can move."
+}'::jsonb),
+('prove', 'yr2words', '{
+  "example1": "I will prove I can do it.",
+  "example2": "She tried to prove her point."
+}'::jsonb),
+('improve', 'yr2words', '{
+  "example1": "Practice helps you improve.",
+  "example2": "I want to improve my writing."
+}'::jsonb),
+('sure', 'yr2words', '{
+  "example1": "I am sure it will rain.",
+  "example2": "Are you sure?"
+}'::jsonb),
+('sugar', 'yr2words', '{
+  "example1": "Do not eat too much sugar.",
+  "example2": "I put sugar in my tea."
+}'::jsonb),
+('eye', 'yr2words', '{
+  "example1": "My eye hurts.",
+  "example2": "She closed one eye."
+}'::jsonb),
+('could', 'yr2words', '{
+  "example1": "I could help you.",
+  "example2": "She could not find it."
+}'::jsonb),
+('should', 'yr2words', '{
+  "example1": "You should be kind.",
+  "example2": "We should listen."
+}'::jsonb),
+('would', 'yr2words', '{
+  "example1": "I would like some water.",
+  "example2": "He would help if he could."
+}'::jsonb),
+('who', 'yr2words', '{
+  "example1": "Who is at the door?",
+  "example2": "Who took my book?"
+}'::jsonb),
+('whole', 'yr2words', '{
+  "example1": "I ate the whole apple.",
+  "example2": "The whole class laughed."
+}'::jsonb),
+('any', 'yr2words', '{
+  "example1": "Do you have any pens?",
+  "example2": "I do not have any money."
+}'::jsonb),
+('many', 'yr2words', '{
+  "example1": "I have many toys.",
+  "example2": "There are many books."
+}'::jsonb),
+('clothes', 'yr2words', '{
+  "example1": "My clothes are clean.",
+  "example2": "Put your clothes away."
+}'::jsonb),
+('busy', 'yr2words', '{
+  "example1": "I am busy now.",
+  "example2": "The shop is busy."
+}'::jsonb),
+('people', 'yr2words', '{
+  "example1": "Many people came.",
+  "example2": "People were kind."
+}'::jsonb),
+('water', 'yr2words', '{
+  "example1": "Drink some water.",
+  "example2": "The water is cold."
+}'::jsonb),
+('again', 'yr2words', '{
+  "example1": "Please read it again.",
+  "example2": "We will try again."
+}'::jsonb),
+('half', 'yr2words', '{
+  "example1": "I ate half the cake.",
+  "example2": "Cut it in half."
+}'::jsonb),
+('money', 'yr2words', '{
+  "example1": "I saved my money.",
+  "example2": "Money is in my bag."
+}'::jsonb),
+('Mr', 'yr2words', '{
+  "example1": "Mr Smith is our teacher.",
+  "example2": "Mr Jones smiled."
+}'::jsonb),
+('Mrs', 'yr2words', '{
+  "example1": "Mrs Brown helped me.",
+  "example2": "Mrs Green is kind."
+}'::jsonb),
+('parents', 'yr2words', '{
+  "example1": "My parents are here.",
+  "example2": "Parents came to school."
+}'::jsonb),
+('Christmas', 'yr2words', '{
+  "example1": "I love Christmas.",
+  "example2": "We get gifts at Christmas."
 }'::jsonb);
